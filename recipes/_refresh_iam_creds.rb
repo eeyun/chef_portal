@@ -30,27 +30,27 @@ ohai 'reload_ec2' do
 end
 
 directory '/etc/chef/ohai/hints' do
-	recursive true
+  recursive true
 end
 
 %w(ec2 iam).each do |hint|
   file "/etc/chef/ohai/hints/#{hint}.json" do
-  	notifies :reload, 'ohai[reload_ec2]', :immediately
+    notifies :reload, 'ohai[reload_ec2]', :immediately
   end
 end
 
 # put my IAM credentials somewhere chef-provisioning can use them
 directory '/root/.aws' do
-	user 'root'
-	group 'root'
-	mode '0700'
+  user 'root'
+  group 'root'
+  mode '0700'
 end
 
 iam_role_name = node['chef_classroom']['iam_instance_profile'].split('/')[1]
 
 template '/root/.aws/config' do
-	source "aws_config.erb"
-	variables(
+  source 'aws_config.erb'
+  variables(
     lazy do
       {
         :access_key => node['ec2']['iam']['security-credentials'][iam_role_name]['AccessKeyId'],
@@ -58,7 +58,7 @@ template '/root/.aws/config' do
       }
     end
   )
-	user 'root'
-	group 'root'
-	mode '0600'
+  user 'root'
+  group 'root'
+  mode '0600'
 end

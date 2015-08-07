@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: chef_portal
-# Recipe:: fundamentals_3x_webapp
+# Recipe:: _fundamentals_3x_webapp
 #
 # Author:: George Miranda (<gmiranda@chef.io>)
 # License:: MIT

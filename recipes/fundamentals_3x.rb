@@ -30,20 +30,20 @@ include_recipe 'chef_portal::provisioner_node'
 package 'git'
 
 execute 'berks_vendor_cookbooks' do
-	action :nothing
-	command 'berks vendor cookbooks'
-	cwd '/root/chef_classroom'
+  action :nothing
+  command 'berks vendor cookbooks'
+  cwd '/root/chef_classroom'
 end
 
 git '/root/chef_classroom' do
   repository 'git://github.com/gmiranda23/chef_classroom.git'
   revision 'master'
   action :sync
-	notifies :run, 'execute[berks_vendor_cookbooks]', :immediately
+  notifies :run, 'execute[berks_vendor_cookbooks]', :immediately
 end
 
 # Setup the web portal interface for fundamentals_3x
-include_recipe 'chef_portal::fundamentals_3x_webapp'
+include_recipe 'chef_portal::_fundamentals_3x_webapp'
 
 # Now go deploy infrastructure like a fucking wizard
 # chef-client -z -r 'recipe[chef_classroom::deploy_workstations]'
