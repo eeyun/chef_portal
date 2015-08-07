@@ -24,9 +24,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-
 portal_user = node['chef_portal']['user']
-portal_pass = node['chef_portal']['password'].crypt("$6$" + rand(36**8).to_s(36))
+portal_pass = node['chef_portal']['password'].crypt('$6$' + rand(36**8).to_s(36))
 chefdk_ver = node['chef_portal']['versions']['chef_dk']
 provis_ver = node['chef_portal']['versions']['chef_provisioning']
 cp_aws_ver = node['chef_portal']['versions']['chef_provisioning_aws']
@@ -60,7 +59,7 @@ end
 
 # install explicitly pinned ChefDK
 chef_dk 'install' do
-	version chefdk_ver
+  version chefdk_ver
   global_shell_init true
 end
 
@@ -74,7 +73,7 @@ end
 # (shell init may not be yet available, so we have to fake it)
 execute 'update_chef_provisioning' do
   command "chef gem install chef-provisioning -v #{provis_ver}"
-    environment(
+  environment(
     'PATH' => '/opt/chefdk/bin:/opt/chefdk/embedded/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin',
     'GEM_ROOT' => '/opt/chefdk/embedded/lib/ruby/gems/2.1.0',
     'GEM_HOME' => '/root/.chefdk/gem/ruby/2.1.0',
@@ -85,7 +84,7 @@ end
 
 execute 'update_chef_provisioning' do
   command "chef gem install chef-provisioning-aws -v #{cp_aws_ver}"
-    environment(
+  environment(
     'PATH' => '/opt/chefdk/bin:/opt/chefdk/embedded/bin:/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin',
     'GEM_ROOT' => '/opt/chefdk/embedded/lib/ruby/gems/2.1.0',
     'GEM_HOME' => '/root/.chefdk/gem/ruby/2.1.0',
@@ -99,7 +98,7 @@ include_recipe 'chef_portal::_refresh_iam_creds'
 
 # disable selinux & iptables because complexity and webapp
 case node['platform']
-  when 'redhat', 'centos', 'fedora'
+when 'redhat', 'centos', 'fedora'
   template '/etc/selinux/config' do
     source 'selinux-config.erb'
     owner 'root'
