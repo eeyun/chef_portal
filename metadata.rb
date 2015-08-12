@@ -4,7 +4,7 @@ maintainer_email 'gmiranda@chef.io'
 license 'mit'
 description 'Installs/Configures chef_portal'
 long_description 'Installs/Configures chef_portal'
-version '0.1.1'
+version '0.1.2'
 
 supports 'centos'
 supports 'amazon'
