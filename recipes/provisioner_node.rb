@@ -105,6 +105,11 @@ when 'redhat', 'centos', 'fedora'
     group 'root'
     mode '0644'
   end
+
+  # enable permissive mode until next boot
+  file '/selinux/enforce' do
+    content '0'
+  end
 end
 
 service 'iptables' do
