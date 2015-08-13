@@ -23,33 +23,49 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
+include_recipe 'apt'
+include_recipe 'ruby::1.9.1'
+include_recipe 'unicorn-ng::install'
+
+package 'git'
+package 'nginx'
 
 service 'iptables' do
   action [:disable, :stop]
 end
 
-package 'httpd'
-
-service 'httpd' do
-  supports :status => true, :restart => true, :reload => true
-  action [:start, :enable]
+cookbook_file '/etc/nginx/nginx.conf' do
+ source 'nginx.conf'
 end
 
-template '/var/www/html/index.html' do
-  source 'webapp/index.html.erb'
-  mode '0644'
-  variables(
-    lazy do
-      {
-        :key => "/root/.ssh/#{node['chef_classroom']['class_name']}-portal_key",
-        :workstations => search('node', 'tags:workstation'),
-        :node1s => search('class_machines', 'tags:node1'),
-        :node2s => search('class_machines', 'tags:node2'),
-        :node3s => search('class_machines', 'tags:node3'),
-        :chefserver => search('node', 'tags:chefserver')
-      }
-    end
-  )
+directory node['chef_portal']['app_root'] do
+  recursive true
+end
+
+service 'nginx' do
+ action [:enable, :start]
+end
+
+# Clone the app repo down to the app_root
+# directory, install the bundle and start
+# unicorn.
+git 'chef portal' do
+ repository node['chef_portal']['app_repo']
+ destination node['chef_portal']['app_root']
+ revision 'gemfile_test'
+ action :sync
+end
+
+execute 'bundle install' do
+  cwd node['chef_portal']['app_root']
+end
+
+unicorn_ng_service 'default' do
+  config node['unicorn-ng']['config']['config_file']
+  bundle_gemfile "#{node['chef_portal']['app_root']}/Gemfile"
+  rails_root node['chef_portal']['app_root']
+  only_if { node['chef_portal']['app_root'] }
+  notifies :restart, 'service[nginx]'
 end
 
 # lazy create the guacamole user map and monkeypatch it
